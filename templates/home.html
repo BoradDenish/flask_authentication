@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Home</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+	<nav class="bg-white shadow-md p-4">
+		<ul class="flex space-x-4">
+			<li><a href="/login" class="text-blue-500 hover:text-blue-700">Login</a></li>
+			<li><a href="/register" class="text-blue-500 hover:text-blue-700">Create account</a></li>
+		</ul>
+	</nav>
+	<div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-center">
+		{% if current_user.is_authenticated %}
+			<h1 class="text-2xl font-bold text-green-600 mb-4">You are logged in</h1>
+			<a href="/logout" class="text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">
+				Logout
+			</a>
+		{% else %}
+			<h1 class="text-2xl font-bold text-red-600 mb-4">You are not logged in</h1>
+			<a href="/login" class="text-white bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition">
+				Login
+			</a>
+			<a href="/register" class="text-white bg-green-500 px-4 py-2 ml-2 rounded hover:bg-green-600 transition">
+				Create Account
+			</a>
+		{% endif %}
+	</div>
+</body>
+</html>
