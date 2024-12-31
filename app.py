@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
@@ -26,14 +27,14 @@ with app.app_context():
 
 @login_manager.user_loader
 def loader_user(user_id):
-	return Users.query.get(user_id)
+	return db.session.get(Users, user_id) 
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
 	if request.method == "POST":
 		user = Users(username=request.form.get("username"),
-					password=request.form.get("password"))
+					password=generate_password_hash(request.form.get("password")))
 		db.session.add(user)
 		db.session.commit()
 		return redirect(url_for("login"))
@@ -45,10 +46,10 @@ def login():
 	if request.method == "POST":
 		user = Users.query.filter_by(
 			username=request.form.get("username")).first()
-		if user.password == request.form.get("password"):
+		if user and check_password_hash(user.password, request.form.get("password")):
 			login_user(user)
 			return redirect(url_for("home"))
-	return render_template("login.html")
+	return render_template("sign_in.html")
 
 
 @app.route("/logout")
