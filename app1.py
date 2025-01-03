@@ -39,7 +39,10 @@ def login():
         
         # SQLAlchemy query to check user
         user = User.query.filter_by(email=email).first()
-        if user and bcrypt.check_password_hash(user.password, 'password') :        
+        print(user.password)
+        is_valid = bcrypt.check_password_hash(user.password, password)
+        print(is_valid)
+        if is_valid:        
         # if user and check_password_hash(user.password, password):        
             session['loggedin'] = True
             session['userid']   = user.id
