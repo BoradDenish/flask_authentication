@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # Initialize Flask app
 app = Flask(__name__)
-bcrypt = Bcrypt(app) 
+bcrypt = Bcrypt(app)
 
 app.secret_key = 'hello'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
@@ -39,9 +39,7 @@ def login():
         
         # SQLAlchemy query to check user
         user = User.query.filter_by(email=email).first()
-        print(user.password)
         is_valid = bcrypt.check_password_hash(user.password, password)
-        print(is_valid)
         if is_valid:        
         # if user and check_password_hash(user.password, password):        
             session['loggedin'] = True
@@ -82,7 +80,7 @@ def register():
         elif not userName or not password or not email:
             message = 'Please fill out the form!'
         else:
-            hashed_password = bcrypt.generate_password_hash('password').decode('utf-8') 
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8') 
 
             # Create a new user
             new_user = User(name=userName, email=email, password=hashed_password)
