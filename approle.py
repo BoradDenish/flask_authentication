@@ -3,10 +3,10 @@ from flask import Flask
 # and store the instance in 'db'
 from flask_sqlalchemy import SQLAlchemy
 # import UserMixin, RoleMixin
-from flask_security import UserMixin, RoleMixin
+from flask_security import Security, SQLAlchemySessionUserDatastore, UserMixin, RoleMixin
+from flask_migrate import Migrate
 # import required libraries from flask_login and flask_security
 # from flask_login import LoginManager, login_manager, login_user
-# from flask_security import Security, SQLAlchemySessionUserDatastore
 
 # import the required libraries
 from flask import render_template, redirect, url_for
@@ -34,6 +34,8 @@ db.init_app(app)
 # runs the app instance
 app.app_context().push()
 
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)
 
 # create table in database for assigning roles
 roles_users = db.Table('roles_users',
@@ -43,30 +45,27 @@ roles_users = db.Table('roles_users',
 # create table in database for storing users
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String, unique=True)
-    password = db.Column(db.String(255), nullable=False, server_default='')
-    active = db.Column(db.Boolean())
+    id          = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    email       = db.Column(db.String, unique=True)
+    password    = db.Column(db.String(255), nullable=False, server_default='')
+    active      = db.Column(db.Boolean())
     # backreferences the user_id from roles_users table
-    roles = db.relationship('Role', secondary=roles_users, backref='roled')
+    roles       = db.relationship('Role', secondary=roles_users, backref='roled')
 
 # create table in database for storing roles
 class Role(db.Model, RoleMixin):
     __tablename__ = 'role'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
+    id      = db.Column(db.Integer(), primary_key=True)
+    name    = db.Column(db.String(80), unique=True)
     
 # creates all database tables
-@app.before_first_request
 def create_tables():
     db.create_all()
 
-
-# load users, roles for a session
-# user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)
-# security = Security(app, user_datastore)
-
-
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("approle.html")
+
+# Run code in debug mode
+if __name__ == "__main__":
+    app.run(debug=True)
