@@ -7,6 +7,8 @@ print(dir(app))
 
 # DB Commands
 
+set FLASK_APP=approle.py
+
 # flask db init
 
 # flask db migrate
