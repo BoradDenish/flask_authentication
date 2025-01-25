@@ -1,13 +1,23 @@
+import os
 from flask import Flask, request, redirect
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='D:\\Git4253\\flask_authentication\\templates')
 app.debug = True
 
 # adding configuration for using a sqlite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.sqlite3'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/site.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.abspath('dbconnectcode/instance/site.sqlite3')}"
+app.config['SQLALCHEMY_ECHO'] = True
+
+print("Database path:", os.path.abspath('dbconnectcode/instance/site.sqlite3'))
+print("Database exists:", os.path.exists('dbconnectcode/instance/site.sqlite3'))
+print("Instance folder exists:", os.path.exists('dbconnectcode/instance'))
+
+print("Current Working Directory:", os.getcwd())
+print("Templates Folder Path:", os.path.join(os.getcwd(), "templates"))
 
 # Creating an SQLAlchemy instance
 db = SQLAlchemy(app)
@@ -33,15 +43,24 @@ class Profile(db.Model):
     def __repr__(self):
         return f"Name : {self.first_name}, Age: {self.age}"
 
+@app.cli.command("seed")
+def seed():
+    p1 = Profile(first_name="John", last_name="Doe", age=30)
+    p2 = Profile(first_name="Jane", last_name="Smith", age=25)
+    db.session.add_all([p1, p2])
+    db.session.commit()
+    print("Database seeded!")
+
+
 # function to render index page
 @app.route('/')
 def index():
     profiles = Profile.query.all()
-    return render_template('index.html', profiles=profiles)
+    return render_template('sqlitedb/index.html', profiles=profiles)
 
 @app.route('/add_data')
 def add_data():
-    return render_template('add_profile.html')
+    return render_template('sqlitedb/add_profile.html')
 
 # function to add profiles
 @app.route('/add', methods=["POST"])
